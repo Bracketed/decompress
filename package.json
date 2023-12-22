@@ -1,23 +1,21 @@
 {
-	"name": "decompress",
-	"version": "4.2.1",
-	"description": "Extracting archives made easy",
+	"name": "@bracketed/decompress",
+	"version": "1.0.0",
+	"description": "Extracting archives made easy!",
 	"license": "MIT",
-	"repository": "kevva/decompress",
-	"author": {
-		"name": "Kevin Mårtensson",
-		"email": "kevinmartensson@gmail.com",
-		"url": "github.com/kevva"
+	"repository": {
+		"type": "git",
+		"url": "git+https://github.com/bracketed/decompress.git",
+		"directory": "."
 	},
-	"engines": {
-		"node": ">=4"
+	"publishConfig": {
+		"access": "public"
 	},
-	"scripts": {
-		"test": "xo && ava"
-	},
-	"files": [
-		"index.js"
-	],
+	"homepage": "https://bracketed.co.uk",
+	"sideEffects": false,
+	"author": "bracketed",
+	"main": "src/index.js",
+	"types": "src/index.d.ts",
 	"keywords": [
 		"bz2",
 		"bzip2",
@@ -30,6 +28,7 @@
 		"unzip"
 	],
 	"dependencies": {
+		"@types/node": "^20.10.5",
 		"decompress-tar": "^4.0.0",
 		"decompress-tarbz2": "^4.0.0",
 		"decompress-targz": "^4.0.0",
@@ -39,23 +38,7 @@
 		"pify": "^2.3.0",
 		"strip-dirs": "^2.0.0"
 	},
-	"devDependencies": {
-		"ava": "*",
-		"esm": "^3.2.25",
-		"is-jpg": "^1.0.0",
-		"path-exists": "^3.0.0",
-		"pify": "^2.3.0",
-		"rimraf": "^3.0.2",
-		"xo": "*"
-	},
-	"ava": {
-		"require": [
-			"esm"
-		]
-	},
-	"xo": {
-		"rules": {
-			"promise/prefer-await-to-then": "off"
-		}
+	"bugs": {
+		"url": "https://github.com/bracketed/decompress/issues"
 	}
 }

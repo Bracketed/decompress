@@ -1,0 +1,22 @@
+name: Upload changes to the npm and yarn registries
+run-name: Upload changes to the npm and yarn registries
+
+on:
+    push:
+
+jobs:
+    publish:
+        runs-on: ubuntu-latest
+        steps:
+            - uses: actions/checkout@v4
+            - uses: actions/setup-node@v4.0.1
+              with:
+                  node-version: '21.x'
+            - run: yarn install --immutable
+            - uses: JS-DevTools/npm-publish@v3.0.1
+              with:
+                  token: ${{ secrets.PAT }}
+            - uses: JS-DevTools/npm-publish@v3.0.1
+              with:
+                  token: ${{ secrets.TOKEN }}
+                  registry: 'https://npm.pkg.github.com'
