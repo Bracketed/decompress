@@ -2,7 +2,7 @@
 
 export = decompress;
 
-declare function decompress(
+declare async function decompress(
 	input: string | Buffer,
 	output?: string | decompress.DecompressOptions,
 	opts?: decompress.DecompressOptions
