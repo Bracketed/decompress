@@ -1,13 +1,14 @@
-'use strict';
-const path = require('path');
-const fs = require('graceful-fs');
-const decompressTar = require('decompress-tar');
-const decompressTarbz2 = require('decompress-tarbz2');
-const decompressTargz = require('decompress-targz');
-const decompressUnzip = require('decompress-unzip');
-const makeDir = require('make-dir');
-const pify = require('pify');
-const stripDirs = require('strip-dirs');
+import { dirname, join } from 'path';
+import fs from 'node:fs';
+import {
+	zip as decompressUnzip,
+	targz as decompressTargz,
+	tarbz2 as decompressTarbz2,
+	tar as decompressTar,
+} from '@bracketed/decompression-types';
+import makeDir from 'make-dir';
+import pify from 'pify';
+import stripDirs from '@bracketed/strip-dirs';
 
 const fsP = pify(fs);
 
@@ -24,7 +25,7 @@ const safeMakeDir = async (dir, realOutputPath) => {
 	return await fsP
 		.realpath(await dir)
 		.catch(async () => {
-			const parent = path.dirname(dir);
+			const parent = dirname(dir);
 			return await safeMakeDir(parent, realOutputPath);
 		})
 		.then(async (realParentPath) => {
@@ -32,7 +33,7 @@ const safeMakeDir = async (dir, realOutputPath) => {
 				throw new Error('Refusing to create a directory outside the output path.');
 			}
 
-			return await makeDir(dir).then(await fsP.realpath);
+			return await makeDir(dir).then(fsP.realpath);
 		});
 };
 
@@ -41,7 +42,7 @@ const preventWritingThroughSymlink = async (destination, realOutputPath) => {
 		.readlink(destination)
 		.catch(() => null)
 		.then(async (symlinkPointsTo) => {
-			if (await symlinkPointsTo) {
+			if (symlinkPointsTo) {
 				throw new Error('Refusing to write into a symlink');
 			}
 			return realOutputPath;
@@ -73,7 +74,7 @@ const extractFile = async (input, output, opts) =>
 
 		return await Promise.all(
 			await files.map(async (x) => {
-				const dest = path.join(output, x.path);
+				const dest = join(output, x.path);
 				const mode = x.mode & ~process.umask();
 				const now = new Date();
 
@@ -89,9 +90,7 @@ const extractFile = async (input, output, opts) =>
 					.then(async (outputPath) => await fsP.realpath(outputPath))
 					.then(async (realOutputPath) => {
 						// Attempt to ensure parent directory exists (failing if it's outside the output dir)
-						return await safeMakeDir(path.dirname(dest), realOutputPath).then(
-							async () => await realOutputPath
-						);
+						return await safeMakeDir(dirname(dest), realOutputPath).then(async () => realOutputPath);
 					})
 					.then(async (realOutputPath) => {
 						if (x.type === 'file') {
@@ -101,20 +100,11 @@ const extractFile = async (input, output, opts) =>
 						return await realOutputPath;
 					})
 					.then(async (realOutputPath) => {
-						return await fsP
-							.realpath(path.dirname(dest))
-							.then(async (realDestinationDir) => {
-								if (
-									(await realDestinationDir.indexOf(
-										realOutputPath
-									)) !== 0
-								) {
-									throw new Error(
-										'Refusing to write outside output directory: ' +
-											(await realDestinationDir)
-									);
-								}
-							});
+						return await fsP.realpath(dirname(dest)).then(async (realDestinationDir) => {
+							if (realDestinationDir.indexOf(realOutputPath) !== 0) {
+								throw new Error('Refusing to write outside output directory: ' + realDestinationDir);
+							}
+						});
 					})
 					.then(async () => {
 						if (x.type === 'link') {
@@ -137,7 +127,7 @@ const extractFile = async (input, output, opts) =>
 		);
 	});
 
-module.exports = async (input, output, opts) => {
+export default async (input, output, opts) => {
 	if (typeof input !== 'string' && !Buffer.isBuffer(input)) {
 		return await Promise.reject(new TypeError('Input file required'));
 	}
