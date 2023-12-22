@@ -1,6 +1,6 @@
 {
 	"name": "@bracketed/decompress",
-	"version": "1.0.3",
+	"version": "1.0.4",
 	"description": "Extracting archives made easy!",
 	"license": "MIT",
 	"type": "module",
